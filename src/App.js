@@ -176,7 +176,7 @@ function App() {
                     }}
                   >
                     <TextField
-                      label={t("city")}
+                      label="Select city"
                       variant="outlined"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
