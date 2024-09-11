@@ -30,7 +30,7 @@ function App() {
   });
 
   const [locale, setLocale] = useState("ar");
-  const [city, setCity] = useState("riyadh"); 
+  const [city, setCity] = useState("kilis"); 
   const direction = locale ==="ar"?"rtl":"ltr"
 
   function handleLanguageClick() {
