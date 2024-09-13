@@ -30,8 +30,8 @@ function App() {
   });
 
   const [locale, setLocale] = useState("ar");
-  const [city, setCity] = useState("kilis"); 
-  const direction = locale ==="ar"?"rtl":"ltr"
+  const [city, setCity] = useState("kilis");
+  const direction = locale === "ar" ? "rtl" : "ltr";
 
   function handleLanguageClick() {
     if (locale === "en") {
@@ -71,64 +71,70 @@ function App() {
   }
 
   useEffect(() => {
-    i18n.changeLanguage("ar");
-    handleChangeCity(); // İlk yüklemede varsayılan şehri getir
+    i18n.changeLanguage("ar").then(() => {
+      handleChangeCity(); // Şehir bilgilerini güncelle
+    });
   }, []);
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="sm">
+      <Container maxWidth="md">
         <div
+          className="wrapper"
           style={{
-            height: "100vh",
+            width: "100%",
+            height: "36.6em",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            flexDirection: "column",
           }}
         >
           <div
             className="card"
             style={{
-              width: "90%",
+              width: "82%",
               background: "rgb(28 52 91 / 36%",
               color: "white",
-              padding: "1rem",
+              padding: "1.5rem",
               borderRadius: "15px",
               boxShadow: "0 11px 1px rgba(0,0,0,0.05",
             }}
-            dir ={direction}
+            dir={direction}
           >
             <div className="card-content">
               <div
                 className="card-header"
-                dir ={direction}
+                dir={direction}
                 style={{
                   display: "flex",
-                  alignItems: "end",
-                  justifyContent: "start",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
                 <Typography
-                  variant="h3"
+                  className="cityName"
                   textAlign={"center"}
-                  sx={{ marginRight: "1rem", fontWeight: "600" }}
+                  sx={{ fontWeight: "600", fontSize: "3.5vw" }}
                 >
                   {weather.cityName}
                 </Typography>
                 <Typography
-                  variant="h5"
+                  className="dateAndTime"
                   textAlign={"center"}
-                  sx={{ marginRight: "1rem" }}
+                  sx={{ fontSize: "3.5vw" }}
                 >
                   {weather.dateAndTime}
                 </Typography>
               </div>
-              <hr />
+              <div>
+                <hr />
+              </div>
               <div
+                className="weather-details"
                 style={{
                   display: "flex",
                   justifyContent: "space-around",
+                  alignItems: "center",
                   margin: "15px",
                 }}
               >
@@ -139,7 +145,7 @@ function App() {
                       alignItems: "center",
                     }}
                   >
-                    <Typography variant="h2" textAlign={"right"}>
+                    <Typography textAlign={"right"} style={{ fontSize: "8vw" }}>
                       {weather.temp}°C
                     </Typography>
                     <img
@@ -147,91 +153,106 @@ function App() {
                       alt="weather-icon"
                     />
                   </div>
-                  <div dir={direction} >
-                  <Typography textAlign={"start"} variant="h6">{t(weather.description)}</Typography>
-
+                  <div dir={direction}>
+                    <Typography className="description" textAlign={"start"} variant="h6">
+                      {t(weather.description)}
+                    </Typography>
                   </div>
                   <div
+                    className="min-max-temp"
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      width: "70%",
+                      width: "93%",
                     }}
                   >
-                    <h5 style={{ textAlign: "center" }}>
+                    <h5 className="min" style={{ textAlign: "center" }}>
                       {t("min")}: {weather.minTemp}°C
                     </h5>
-                    <h5 style={{ margin: "0 5px" }}>|</h5>
-                    <h5 style={{ textAlign: "center" }}>
+                    <h5
+                      style={{
+                        margin: "0 5px",
+                        fontSize: "25px",
+                        fontWeight: "400",
+                      }}
+                    >
+                      |
+                    </h5>
+                    <h5 className="max" style={{ textAlign: "center" }}>
                       {t("max")}: {weather.maxTemp}°C
                     </h5>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "175%",
-                    }}
-                  >
-                    <TextField
-                      label="Select city"
-                      variant="outlined"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      sx={{
-                        width: "75%",
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderColor: "white",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "white",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "white",
-                          },
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "white",
-                        },
-                        "& .MuiOutlinedInput-input": {
-                          color: "white",
-                        },
-                      }}
-                    />
-                    <Button
-                      variant="contained"
-                      sx={{
-                        width: "20%",
-                        height: "9.8vh",
-                        background: "white",
-                        color: "black",
-                      }}
-                      onClick={handleChangeCity}
-                    >
-                      {locale === "en" ? "Search" : " بحث "}
-                    </Button>
-                  </div>
                 </div>
-                <CloudIcon sx={{ fontSize: "200px", color: "white" }} />
+
+                <CloudIcon
+                  className="cloud-icon"
+                  sx={{ fontSize: "150px", color: "white" }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <TextField
+                  label="Select city"
+                  variant="outlined"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  sx={{
+                    width: "75%",
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "white",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "white",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "white",
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "white",
+                    },
+                    "& .MuiOutlinedInput-input": {
+                      color: "white",
+                    },
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  sx={{
+                    fontWeight: "900",
+                    width: "20%",
+                    height: "3.4rem",
+                    background: "white",
+                    color: "black",
+                  }}
+                  onClick={handleChangeCity}
+                >
+                  {locale === "en" ? "Search" : " بحث "}
+                </Button>
               </div>
             </div>
-          </div>
-          <div
-            style={{
-              marginTop: "0.5rem",
-              width: "100%",
-             
-              display: "flex",
-              justifyContent: "end",
-            }}
-            dir ={direction}
-          >
-            <Button variant="text" onClick={handleLanguageClick}>
-              {locale === "en" ? "Arabic" : "إنجليزي"}
-            </Button>
+            <div
+              style={{
+                marginTop: "1rem",
+                width: "100%",
+
+                display: "flex",
+                justifyContent: "end",
+              }}
+              dir={direction}
+            >
+              <Button variant="text" onClick={handleLanguageClick}>
+                {locale === "en" ? "Arabic" : "إنجليزي"}
+              </Button>
+            </div>
           </div>
         </div>
       </Container>
