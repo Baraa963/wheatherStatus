@@ -4,12 +4,15 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField"; // Şehir ismi için TextField
 import CloudIcon from "@mui/icons-material/Cloud";
+import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import "moment/min/locales";
 import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+import { setCity, fetchWeather } from "./weatherApiSlice";
+
 moment.locale("ar");
 
 function App() {
@@ -20,17 +23,17 @@ function App() {
     },
   });
 
-  const [weather, setWeather] = useState({
-    cityName: "",
-    dateAndTime: null,
-    temp: null,
-    description: "",
-    minTemp: null,
-    maxTemp: null,
+  const isLoading = useSelector((state) => {
+    return state.weather.isLoading;
   });
+  const weather = useSelector((state) => {
+    return state.weather.weather;
+  });
+  const city = useSelector((state) => state.weather.city); // Redux'taki şehir adını seç
+
+  const dispatch = useDispatch();
 
   const [locale, setLocale] = useState("ar");
-  const [city, setCity] = useState("kilis");
   const direction = locale === "ar" ? "rtl" : "ltr";
 
   function handleLanguageClick() {
@@ -43,38 +46,22 @@ function App() {
       i18n.changeLanguage("en");
       moment.locale("en");
     }
-    setWeather({
-      ...weather,
-      dateAndTime: moment().format("MMMM Do YYYY, h:mm a"),
-    });
   }
 
   function handleChangeCity() {
-    axios
-      .get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=38cc39a17c3d6842bed39cdde9ebddf0`
-      )
-      .then(function (response) {
-        setWeather({
-          cityName: response.data.name,
-          dateAndTime: moment().format("MMMM Do YYYY, h:mm a"),
-          temp: Math.round(response.data.main.temp - 273.15),
-          description: response.data.weather[0].description,
-          icon: response.data.weather[0].icon,
-          minTemp: Math.round(response.data.main.temp_min - 273.15),
-          maxTemp: Math.round(response.data.main.temp_max - 273.15),
-        });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    dispatch(fetchWeather(city)); // Güncel şehir bilgisini kullanarak hava durumu al
+
   }
 
   useEffect(() => {
-    i18n.changeLanguage("ar").then(() => {
-      handleChangeCity(); // Şehir bilgilerini güncelle
-    });
-  }, []);
+    if (city && city !== "undefined") { // Şehir bilgisini kontrol et
+      console.log("Şehir değişti, yeni hava durumu getiriliyor:", city);
+      dispatch(fetchWeather(city)); // Şehir adına göre hava durumu getir
+    } else {
+      console.error("Geçersiz şehir bilgisi");
+    }
+  }, [city, dispatch]); // 'city' bağımlılık olarak eklendi
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -145,6 +132,10 @@ function App() {
                       alignItems: "center",
                     }}
                   >
+                    {isLoading ? (
+                      <CircularProgress sx={{ color: "white" }} />
+                    ) : null}
+
                     <Typography textAlign={"right"} style={{ fontSize: "8vw" }}>
                       {weather.temp}°C
                     </Typography>
@@ -154,7 +145,11 @@ function App() {
                     />
                   </div>
                   <div dir={direction}>
-                    <Typography className="description" textAlign={"start"} variant="h6">
+                    <Typography
+                      className="description"
+                      textAlign={"start"}
+                      variant="h6"
+                    >
                       {t(weather.description)}
                     </Typography>
                   </div>
@@ -202,7 +197,7 @@ function App() {
                   label="Select city"
                   variant="outlined"
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(e) => dispatch(setCity(e.target.value))} // Redux'taki şehir bilgisini güncelle
                   sx={{
                     width: "75%",
                     "& .MuiOutlinedInput-root": {
