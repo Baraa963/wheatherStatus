@@ -30,6 +30,7 @@ function App() {
     return state.weather.weather;
   });
   const city = useSelector((state) => state.weather.city); // Redux'taki şehir adını seç
+  const [inputCity, setInputCity] = useState(city); // Local state for TextField
 
   const dispatch = useDispatch();
 
@@ -49,18 +50,15 @@ function App() {
   }
 
   function handleChangeCity() {
-    dispatch(fetchWeather(city)); // Güncel şehir bilgisini kullanarak hava durumu al
-
+    dispatch(setCity(inputCity)); // Dispatch the new city to Redux
+    dispatch(fetchWeather(inputCity)); // Fetch weather for the new city
   }
 
   useEffect(() => {
-    if (city && city !== "undefined") { // Şehir bilgisini kontrol et
-      console.log("Şehir değişti, yeni hava durumu getiriliyor:", city);
-      dispatch(fetchWeather(city)); // Şehir adına göre hava durumu getir
-    } else {
-      console.error("Geçersiz şehir bilgisi");
+    if (city && city !== "undefined") {
+      dispatch(fetchWeather(city));
     }
-  }, [city, dispatch]); // 'city' bağımlılık olarak eklendi
+  }, [city, dispatch]);
   
 
   return (
